@@ -1,0 +1,27 @@
+.analytics-container {
+  padding: 2rem;
+  background: #fff;
+  border-radius: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  margin: 2rem 0;
+}
+.analytics-container h2 {
+  color: #1e293b;
+  margin-bottom: 1rem;
+}
+.analytics-section {
+  margin-bottom: 2rem;
+}
+.analytics-section h3 {
+  color: #2563eb;
+  margin-bottom: 0.7rem;
+}
+.analytics-list {
+  list-style: none;
+  padding: 0;
+  color: #334155;
+  font-size: 1.1rem;
+}
+.analytics-list li {
+  margin-bottom: 0.5rem;
+}
