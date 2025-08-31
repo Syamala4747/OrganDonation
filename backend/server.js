@@ -4,7 +4,10 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 dotenv.config();
 
+
 import connectDB from './config/db.js';
+import User from './models/User.js';
+import bcrypt from 'bcryptjs';
 
 const app = express();
 app.use(express.json());
@@ -36,7 +39,29 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
-connectDB().then(() => {
+
+const setupAdmin = async () => {
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  if (!adminEmail || !adminPassword) return;
+  const existing = await User.findOne({ email: adminEmail });
+  if (!existing) {
+    const hashed = await bcrypt.hash(adminPassword, 10);
+    await User.create({
+      username: 'admin',
+      email: adminEmail,
+      password: hashed,
+      category: 'Admin',
+      status: 'APPROVED'
+    });
+    console.log('Admin user created');
+  } else {
+    console.log('Admin user already exists');
+  }
+};
+
+connectDB().then(async () => {
+  await setupAdmin();
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });

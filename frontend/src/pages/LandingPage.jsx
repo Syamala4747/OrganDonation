@@ -53,29 +53,37 @@ const LandingPage = () => {
           Every day, thousands of people wait for life-saving organ transplants and blood transfusions. Your generous donation can be the miracle they're hoping for.
         </p>
         <div className="donation-matters-cards" style={{display:'flex', gap:'2rem', justifyContent:'center', marginBottom:'2.5rem'}}>
-          <div className="donation-card blood" style={{background:'#fff5f5', borderRadius:'1.5rem', boxShadow:'0 4px 16px rgba(239,68,68,0.08)', flex:'1', minWidth:'260px', padding:'2rem 1.5rem', textAlign:'center'}}>
+          <div className="donation-card blood" style={{background:'#fff5f5', borderRadius:'1.5rem', boxShadow:'0 4px 16px rgba(239,68,68,0.08)', flex:'1', minWidth:'220px', padding:'2rem 1.2rem', textAlign:'center'}}>
             <div className="donation-card-icon-bg" style={{marginBottom:'1rem'}}>
               <span className="donation-card-icon" style={{color:'#ef4444', fontSize:'2.2rem'}}>&#9825;</span>
             </div>
-            <h3 style={{fontWeight:'bold', fontSize:'1.35rem', marginBottom:'0.7rem', color:'#1e293b'}}>Blood Donation</h3>
+            <h3 style={{fontWeight:'bold', fontSize:'1.2rem', marginBottom:'0.7rem', color:'#1e293b'}}>Blood Donation</h3>
             <p style={{color:'#334155', marginBottom:'0.7rem'}}>One blood donation can save up to 3 lives. Help patients with cancer, blood disorders, and those undergoing surgery.</p>
             <div className="donation-card-highlight blood" style={{color:'#ef4444', fontWeight:'bold'}}>Every 2 seconds, someone needs blood</div>
           </div>
-          <div className="donation-card organ" style={{background:'#f0fff4', borderRadius:'1.5rem', boxShadow:'0 4px 16px rgba(34,197,94,0.08)', flex:'1', minWidth:'260px', padding:'2rem 1.5rem', textAlign:'center'}}>
+          <div className="donation-card organ" style={{background:'#f0fff4', borderRadius:'1.5rem', boxShadow:'0 4px 16px rgba(34,197,94,0.08)', flex:'1', minWidth:'220px', padding:'2rem 1.2rem', textAlign:'center'}}>
             <div className="donation-card-icon-bg" style={{marginBottom:'1rem'}}>
               <span className="donation-card-icon" style={{color:'#22c55e', fontSize:'2.2rem'}}>&#9825;</span>
             </div>
-            <h3 style={{fontWeight:'bold', fontSize:'1.35rem', marginBottom:'0.7rem', color:'#1e293b'}}>Organ Donation</h3>
+            <h3 style={{fontWeight:'bold', fontSize:'1.2rem', marginBottom:'0.7rem', color:'#1e293b'}}>Organ Donation</h3>
             <p style={{color:'#334155', marginBottom:'0.7rem'}}>One organ donor can save 8 lives and enhance the lives of 75 others through tissue and cornea donation.</p>
             <div className="donation-card-highlight organ" style={{color:'#22c55e', fontWeight:'bold'}}>100,000+ people need organs</div>
           </div>
-          <div className="donation-card medical" style={{background:'#f0f6ff', borderRadius:'1.5rem', boxShadow:'0 4px 16px rgba(37,99,235,0.08)', flex:'1', minWidth:'260px', padding:'2rem 1.5rem', textAlign:'center'}}>
+          <div className="donation-card medical" style={{background:'#f0f6ff', borderRadius:'1.5rem', boxShadow:'0 4px 16px rgba(37,99,235,0.08)', flex:'1', minWidth:'220px', padding:'2rem 1.2rem', textAlign:'center'}}>
             <div className="donation-card-icon-bg" style={{marginBottom:'1rem'}}>
               <span className="donation-card-icon" style={{color:'#2563eb', fontSize:'2.2rem'}}>&#128203;</span>
             </div>
-            <h3 style={{fontWeight:'bold', fontSize:'1.35rem', marginBottom:'0.7rem', color:'#1e293b'}}>Medical Partnership</h3>
+            <h3 style={{fontWeight:'bold', fontSize:'1.2rem', marginBottom:'0.7rem', color:'#1e293b'}}>Medical Partnership</h3>
             <p style={{color:'#334155', marginBottom:'0.7rem'}}>We work with hospitals and medical organizations to ensure safe, ethical donation processes.</p>
             <div className="donation-card-highlight medical" style={{color:'#2563eb', fontWeight:'bold'}}>500+ Partner Hospitals</div>
+          </div>
+          <div className="donation-card volunteer" style={{background:'#f9f7ff', borderRadius:'1.5rem', boxShadow:'0 4px 16px rgba(139,92,246,0.08)', flex:'1', minWidth:'220px', padding:'2rem 1.2rem', textAlign:'center'}}>
+            <div className="donation-card-icon-bg" style={{marginBottom:'1rem'}}>
+              <span className="donation-card-icon" style={{color:'#8b5cf6', fontSize:'2.2rem'}}>&#128106;</span>
+            </div>
+            <h3 style={{fontWeight:'bold', fontSize:'1.2rem', marginBottom:'0.7rem', color:'#1e293b'}}>Volunteers</h3>
+            <p style={{color:'#334155', marginBottom:'0.7rem'}}>Support our mission by volunteering for awareness drives, events, and donor support programs.</p>
+            <div className="donation-card-highlight volunteer" style={{color:'#8b5cf6', fontWeight:'bold'}}>Join 2,000+ Volunteers</div>
           </div>
         </div>
         <div className="donation-matters-cta" style={{display:'flex', justifyContent:'center'}}>

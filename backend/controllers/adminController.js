@@ -28,8 +28,42 @@ export const getDashboardSummary = async (req, res) => {
 // Approvals (pending hospital/org)
 export const getPendingApprovals = async (req, res) => {
   try {
-    const pending = await User.find({ role: { $in: ['hospital', 'organization'] }, isApproved: false });
-    res.json(pending);
+    // Find all pending hospital and organization users
+    const pendingUsers = await User.find({ category: { $in: ['Hospital', 'Organization'] }, status: 'PENDING' });
+    // For each user, populate their hospital/org details and flatten the result
+    const results = await Promise.all(pendingUsers.map(async (user) => {
+      let details = {};
+      if (user.category === 'Hospital') {
+        const h = await Hospital.findOne({ user: user._id });
+        if (h) {
+          details = {
+            name: h.name,
+            licenseId: h.licenseId,
+            address: h.address,
+            contact: h.contact,
+            status: h.status
+          };
+        }
+      } else if (user.category === 'Organization') {
+        const o = await Organization.findOne({ user: user._id });
+        if (o) {
+          details = {
+            name: o.name,
+            address: o.address,
+            contact: o.contact,
+            status: o.status
+          };
+        }
+      }
+      return {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        category: user.category,
+        ...details
+      };
+    }));
+    res.json(results);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -40,8 +74,14 @@ export const approveUser = async (req, res) => {
     const { userId } = req.body;
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: 'User not found' });
-    user.isApproved = true;
+    user.status = 'APPROVED';
     await user.save();
+    // Also update Hospital/Organization status if applicable
+    if (user.category === 'Hospital') {
+      await Hospital.findOneAndUpdate({ user: user._id }, { status: 'APPROVED' });
+    } else if (user.category === 'Organization') {
+      await Organization.findOneAndUpdate({ user: user._id }, { status: 'APPROVED' });
+    }
     res.json({ message: 'User approved' });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -51,8 +91,16 @@ export const approveUser = async (req, res) => {
 export const rejectUser = async (req, res) => {
   try {
     const { userId } = req.body;
-    await User.findByIdAndDelete(userId);
-    res.json({ message: 'User rejected and deleted' });
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    user.status = 'REJECTED';
+    await user.save();
+    if (user.category === 'Hospital') {
+      await Hospital.findOneAndUpdate({ user: user._id }, { status: 'REJECTED' });
+    } else if (user.category === 'Organization') {
+      await Organization.findOneAndUpdate({ user: user._id }, { status: 'REJECTED' });
+    }
+    res.json({ message: 'User rejected' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

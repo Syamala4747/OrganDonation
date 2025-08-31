@@ -1,3 +1,4 @@
+
 import React from 'react';
 import './AdminAnalytics.css';
 
@@ -11,23 +12,21 @@ const organs = [
 ];
 
 const AdminAnalytics = () => (
-  <div className="analytics-container">
-    <h2>Analytics</h2>
-    <div className="analytics-section">
-      <h3>Active Donors by Blood Group</h3>
-      <ul className="analytics-list">
+  <div className="dashboard-content">
+    <h1 style={{fontWeight:'bold', fontSize:'2.2rem', marginBottom:'1.2rem'}}>Analytics</h1>
+    <div style={{display:'flex', gap:'2rem', flexWrap:'wrap', marginBottom:'2rem'}}>
+      <div style={{flex:'1', minWidth:'260px', padding:'2rem 1.2rem', textAlign:'center'}}>
+        <div style={{fontWeight:'bold', fontSize:'1.3rem', color:'#2563eb', marginBottom:'0.7rem'}}>Active Donors by Blood Group</div>
         {bloodGroups.map((bg, idx) => (
-          <li key={idx}><strong>{bg.group}:</strong> {bg.count}</li>
+          <div key={idx} style={{fontSize:'1.1rem', marginBottom:'0.3rem'}}><b>{bg.group}:</b> {bg.count}</div>
         ))}
-      </ul>
-    </div>
-    <div className="analytics-section">
-      <h3>Most Requested Organ</h3>
-      <ul className="analytics-list">
+      </div>
+      <div style={{flex:'1', minWidth:'260px', padding:'2rem 1.2rem', textAlign:'center'}}>
+        <div style={{fontWeight:'bold', fontSize:'1.3rem', color:'#8b5cf6', marginBottom:'0.7rem'}}>Most Requested Organ</div>
         {organs.map((org, idx) => (
-          <li key={idx}><strong>{org.organ}:</strong> {org.count}</li>
+          <div key={idx} style={{fontSize:'1.1rem', marginBottom:'0.3rem'}}><b>{org.organ}:</b> {org.count}</div>
         ))}
-      </ul>
+      </div>
     </div>
   </div>
 );

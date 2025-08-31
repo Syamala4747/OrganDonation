@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import Login from './auth/Login';
+import Signup from './auth/Signup';
 import DonorHome from './pages/donor/DonorHome';
 import DonorStatus from './pages/donor/DonorStatus';
 import DonorProfile from './pages/donor/DonorProfile';
@@ -17,7 +18,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
         <Route path="/donor" element={<DonorHome />} />
         <Route path="/donor/status" element={<DonorStatus />} />
         <Route path="/donor/profile" element={<DonorProfile />} />
