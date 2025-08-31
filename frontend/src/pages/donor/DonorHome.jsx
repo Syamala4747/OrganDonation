@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import DonorSidebar from '../../components/Sidebar/DonorSidebar';
+import Chatbot from '../../components/Chatbot';
 import './DonorHome.css';
 
 const DonorHome = () => {
@@ -22,6 +23,7 @@ const DonorHome = () => {
   const [status, setStatus] = React.useState('');
   const [showToast, setShowToast] = useState(false);
   const photoInputRef = React.useRef();
+  const medicalInputRef = React.useRef();
   const inputStyle = {width:'100%', padding:'0.7rem 1rem', borderRadius:'1.2rem', border:'1px solid #e5e7eb', background:'#f3f4f6', fontSize:'1rem', marginBottom:'0.8rem', boxSizing:'border-box'};
   const donationTypeLabel = active => ({flex:1, background:active?'#e0f7fa':'#f3f4f6', borderRadius:'1rem', padding:'0.7rem 1rem', cursor:'pointer', border:active?'2px solid #22c55e':'2px solid transparent'});
   function handlePledgeChange(org, checked) {
@@ -38,14 +40,22 @@ const DonorHome = () => {
   async function handleSubmit(e) {
     e.preventDefault();
     setStatus('Submitting...');
-    let endpoint = '';
-    if (form.donationType === 'After Death') {
-      endpoint = '/api/organization/donate';
-    } else {
-      endpoint = '/api/hospital/donate';
-    }
     try {
-      await window.axios.post('/api/donor/register', form);
+      const formData = new FormData();
+      for (const key in form) {
+        if (form[key] !== undefined && form[key] !== null) {
+          if (key === 'pledge') {
+            form[key].forEach((org, idx) => formData.append(`pledge[${idx}]`, org));
+          } else if (key === 'medicalCertificate' && form.medicalCertificate) {
+            formData.append('medicalCertificate', form.medicalCertificate);
+          } else {
+            formData.append(key, form[key]);
+          }
+        }
+      }
+      await window.axios.post('/api/donor/register', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       setStatus('Successfully registered for organ donation. Thank you!');
       setShowToast(true);
       setTimeout(() => setShowToast(false), 3000);
@@ -60,8 +70,13 @@ const DonorHome = () => {
         pledge: [],
         phone: '',
         donationType: 'Before Death',
-        nomineeName: '',
-        nomineePhone: ''
+        nomineeName1: '',
+        nomineePhone1: '',
+        nomineeName2: '',
+        nomineePhone2: '',
+        nomineeName3: '',
+        nomineePhone3: '',
+        medicalCertificate: null
       });
     } catch (err) {
       setStatus('Failed to register. Please try again.');
@@ -134,7 +149,12 @@ const DonorHome = () => {
                   <label style={{fontWeight:'500'}}>Profile Photo</label>
                   <div style={{border:'1.5px dashed #cbd5e1', borderRadius:'1.2rem', padding:'1.2rem', textAlign:'center', marginBottom:'1rem', cursor:'pointer'}} onClick={()=>photoInputRef.current.click()}>
                     {form.photo ? <img src={form.photo} alt="Profile" style={{width:'80px', height:'80px', borderRadius:'50%', objectFit:'cover'}} /> : <span style={{color:'#94a3b8', fontSize:'2.2rem'}}>Click to upload photo</span>}
-                    <input type="file" accept="image/*" ref={photoInputRef} style={{display:'none'}} onChange={handlePhotoUpload} required />
+                    <input type="file" accept="image/*" ref={photoInputRef} style={{display:'none'}} onChange={handlePhotoUpload} />
+                  </div>
+                  <label style={{fontWeight:'500'}}>Medical Certificate (Optional)</label>
+                  <div style={{border:'1.5px dashed #cbd5e1', borderRadius:'1.2rem', padding:'1.2rem', textAlign:'center', marginBottom:'1rem', cursor:'pointer'}} onClick={()=>medicalInputRef.current.click()}>
+                    {form.medicalCertificate ? <span style={{color:'#22c55e'}}>Uploaded: {form.medicalCertificate.name}</span> : <span style={{color:'#94a3b8'}}>Upload medical certificate (PDF, JPG, PNG)</span>}
+                    <input type="file" accept=".pdf,image/*" ref={medicalInputRef} style={{display:'none'}} onChange={e=>setForm({...form, medicalCertificate:e.target.files[0]})} />
                   </div>
                   <label style={{fontWeight:'500'}}>Organ Pledge</label>
                   <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.7rem', marginBottom:'1rem'}}>
@@ -151,24 +171,61 @@ const DonorHome = () => {
                       <span style={{marginLeft:'0.5rem'}}>Before Death (Living Donation)</span>
                       <div style={{fontSize:'0.95rem', color:'#64748b'}}>Donate organs like kidney, partial liver while alive</div>
                     </label>
-                    <label style={donationTypeLabel(form.donationType==='After Death')}>
-                      <input type="radio" name="donationType" checked={form.donationType==='After Death'} onChange={()=>setForm({...form, donationType:'After Death'})} required />
-                      <span style={{marginLeft:'0.5rem'}}>After Death (Deceased Donation)</span>
+                    <label style={donationTypeLabel(form.donationType==='Order Pledge')}>
+                      <input type="radio" name="donationType" checked={form.donationType==='Order Pledge'} onChange={()=>setForm({...form, donationType:'Order Pledge'})} required />
+                      <span style={{marginLeft:'0.5rem'}}>Order Pledge (Deceased Donation)</span>
                       <div style={{fontSize:'0.95rem', color:'#64748b'}}>Donate all selected organs after death</div>
                     </label>
+                    <label style={donationTypeLabel(form.donationType==='Both')}>
+                      <input type="radio" name="donationType" checked={form.donationType==='Both'} onChange={()=>setForm({...form, donationType:'Both'})} required />
+                      <span style={{marginLeft:'0.5rem'}}>Both</span>
+                      <div style={{fontSize:'0.95rem', color:'#64748b'}}>Pledge for both living and deceased donation</div>
+                    </label>
                   </div>
-                  {form.donationType==='After Death' && (
-                    <div style={{display:'flex', gap:'1rem', marginBottom:'1rem'}}>
+                  <div style={{marginBottom:'1rem'}}>
+                    <div style={{display:'flex', gap:'1rem', marginBottom:'0.7rem'}}>
                       <div style={{flex:1}}>
-                        <label style={{fontWeight:'500'}}>Nominee Name</label>
-                        <input type="text" value={form.nomineeName} onChange={e=>setForm({...form, nomineeName:e.target.value})} required placeholder="Emergency contact name" style={inputStyle} />
+                        <label style={{fontWeight:'500'}}>Nominee 1 Name</label>
+                        <input type="text" value={form.nomineeName1 || ''} onChange={e=>setForm({...form, nomineeName1:e.target.value})} required placeholder="Emergency contact name" style={inputStyle} />
                       </div>
                       <div style={{flex:1}}>
-                        <label style={{fontWeight:'500'}}>Nominee Phone</label>
-                        <input type="tel" value={form.nomineePhone} onChange={e=>setForm({...form, nomineePhone:e.target.value})} required placeholder="+1 (555) 123-4567" style={inputStyle} />
+                        <label style={{fontWeight:'500'}}>Nominee 1 Phone</label>
+                        <input type="tel" value={form.nomineePhone1 || ''} onChange={e=>setForm({...form, nomineePhone1:e.target.value})} required placeholder="+1 (555) 123-4567" style={inputStyle} />
+                      </div>
+                      <div style={{flex:1}}>
+                        <label style={{fontWeight:'500'}}>Nominee 1 Email</label>
+                        <input type="email" value={form.nomineeEmail1 || ''} onChange={e=>setForm({...form, nomineeEmail1:e.target.value})} required placeholder="nominee1@email.com" style={inputStyle} />
                       </div>
                     </div>
-                  )}
+                    <div style={{display:'flex', gap:'1rem', marginBottom:'0.7rem'}}>
+                      <div style={{flex:1}}>
+                        <label style={{fontWeight:'500'}}>Nominee 2 Name</label>
+                        <input type="text" value={form.nomineeName2 || ''} onChange={e=>setForm({...form, nomineeName2:e.target.value})} required placeholder="Emergency contact name" style={inputStyle} />
+                      </div>
+                      <div style={{flex:1}}>
+                        <label style={{fontWeight:'500'}}>Nominee 2 Phone</label>
+                        <input type="tel" value={form.nomineePhone2 || ''} onChange={e=>setForm({...form, nomineePhone2:e.target.value})} required placeholder="+1 (555) 123-4567" style={inputStyle} />
+                      </div>
+                      <div style={{flex:1}}>
+                        <label style={{fontWeight:'500'}}>Nominee 2 Email</label>
+                        <input type="email" value={form.nomineeEmail2 || ''} onChange={e=>setForm({...form, nomineeEmail2:e.target.value})} required placeholder="nominee2@email.com" style={inputStyle} />
+                      </div>
+                    </div>
+                    <div style={{display:'flex', gap:'1rem', marginBottom:'0.7rem'}}>
+                      <div style={{flex:1}}>
+                        <label style={{fontWeight:'500'}}>Nominee 3 Name</label>
+                        <input type="text" value={form.nomineeName3 || ''} onChange={e=>setForm({...form, nomineeName3:e.target.value})} required placeholder="Emergency contact name" style={inputStyle} />
+                      </div>
+                      <div style={{flex:1}}>
+                        <label style={{fontWeight:'500'}}>Nominee 3 Phone</label>
+                        <input type="tel" value={form.nomineePhone3 || ''} onChange={e=>setForm({...form, nomineePhone3:e.target.value})} required placeholder="+1 (555) 123-4567" style={inputStyle} />
+                      </div>
+                      <div style={{flex:1}}>
+                        <label style={{fontWeight:'500'}}>Nominee 3 Email</label>
+                        <input type="email" value={form.nomineeEmail3 || ''} onChange={e=>setForm({...form, nomineeEmail3:e.target.value})} required placeholder="nominee3@email.com" style={inputStyle} />
+                      </div>
+                    </div>
+                  </div>
                   <button type="submit" style={{width:'100%', background:'#22c55e', color:'#fff', fontWeight:'bold', fontSize:'1.1rem', border:'none', borderRadius:'1.2rem', padding:'0.8rem 0', marginTop:'1.2rem', cursor:'pointer'}}>Submit Registration</button>
                   <button type="button" style={{width:'100%', background:'#e5e7eb', color:'#222', fontWeight:'bold', fontSize:'1rem', border:'none', borderRadius:'1.2rem', padding:'0.7rem 0', marginTop:'0.7rem', cursor:'pointer'}} onClick={()=>setShowModal(false)}>Cancel</button>
                   {status && <div style={{marginTop:'1rem', textAlign:'center', color:'#2563eb', fontWeight:'500'}}>{status}</div>}
@@ -237,6 +294,7 @@ const DonorHome = () => {
               @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
             `}</style>
           </div>
+          <Chatbot />
         </div>
       </div>
     </div>

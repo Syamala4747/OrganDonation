@@ -23,6 +23,7 @@ import organizationRoutes from './routes/organizationRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import supportRoutes from './routes/supportRoutes.js';
 import organDonationRoutes from './routes/organDonationRoutes.js';
+import chatbotRoutes from './routes/chatbotRoutes.js';
 
 // API routes
 app.use('/api/auth', authRoutes);
@@ -33,6 +34,7 @@ app.use('/api/hospital', hospitalRoutes);
 app.use('/api/organization', organizationRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/support', supportRoutes);
+app.use('/api/chatbot', chatbotRoutes);
 
 // Error handler
 app.use(errorHandler);
