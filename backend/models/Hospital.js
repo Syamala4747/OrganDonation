@@ -6,6 +6,7 @@ const hospitalSchema = new mongoose.Schema({
   licenseId: { type: String, required: true },
   address: { type: String, required: true },
   contact: { type: String, required: true },
+  status: { type: String, enum: ['PENDING', 'APPROVED', 'REJECTED'], default: 'PENDING' },
   verificationDocs: [{ type: String }],
   requests: [{
     type: { type: String },

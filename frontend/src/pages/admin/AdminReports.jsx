@@ -7,8 +7,8 @@ const reports = [
 ];
 
 const AdminReports = () => (
-  <div className="reports-container">
-    <h2>Reports / Issues</h2>
+  <div style={{padding:'2rem 1.2rem', width:'100%'}}>
+    <h2 style={{color:'#1e293b', marginBottom:'1rem'}}>Reports / Issues</h2>
     <table className="reports-table">
       <thead>
         <tr>
