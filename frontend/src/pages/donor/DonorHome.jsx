@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import DonorSidebar from '../../components/Sidebar/DonorSidebar';
 import Chatbot from '../../components/Chatbot';
 import './DonorHome.css';
@@ -18,16 +17,8 @@ const DonorHome = () => {
     pledge: [],
     phone: '',
     donationType: 'Before Death',
-    nomineeName1: '',
-    nomineePhone1: '',
-    nomineeEmail1: '',
-    nomineeName2: '',
-    nomineePhone2: '',
-    nomineeEmail2: '',
-    nomineeName3: '',
-    nomineePhone3: '',
-    nomineeEmail3: '',
-    medicalCertificate: null
+    nomineeName: '',
+    nomineePhone: ''
   });
   const [status, setStatus] = React.useState('');
   const [showToast, setShowToast] = useState(false);
@@ -48,23 +39,6 @@ const DonorHome = () => {
   }
   async function handleSubmit(e) {
     e.preventDefault();
-    // Frontend validation for required fields
-    const requiredFields = [
-      'name', 'age', 'gender', 'bloodType', 'email', 'location', 'phone',
-      'donationType', 'nomineeName1', 'nomineePhone1', 'nomineeEmail1',
-      'nomineeName2', 'nomineePhone2', 'nomineeEmail2',
-      'nomineeName3', 'nomineePhone3', 'nomineeEmail3'
-    ];
-    for (const field of requiredFields) {
-      if (!form[field] || (typeof form[field] === 'string' && form[field].trim() === '')) {
-        setStatus(`Please fill in all required fields before submitting.`);
-        return;
-      }
-    }
-    if (!form.pledge || form.pledge.length === 0) {
-      setStatus('Please select at least one organ to pledge.');
-      return;
-    }
     setStatus('Submitting...');
     try {
       const formData = new FormData();
@@ -73,56 +47,39 @@ const DonorHome = () => {
           if (key === 'pledge') {
             form[key].forEach((org, idx) => formData.append(`pledge[${idx}]`, org));
           } else if (key === 'medicalCertificate' && form.medicalCertificate) {
-            formData.append('medicalCertificate', form.medicalCertificate); // only this as file
-          } else if (key !== 'medicalCertificate') {
-            formData.append(key, form[key]); // everything else as string
+            formData.append('medicalCertificate', form.medicalCertificate);
+          } else {
+            formData.append(key, form[key]);
           }
         }
       }
-      let response;
-      try {
-        response = await axios.post('/api/donor/register', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
-      } catch (err) {
-        setStatus('Network or server error. Please try again.');
-        setShowModal(false);
-        return;
-      }
-      if (response.data && response.data.success) {
-        setStatus('Successfully registered for organ donation. Thank you!');
-        setShowToast(true);
-        setForm({
-          name: '',
-          age: '',
-          gender: '',
-          bloodType: '',
-          email: '',
-          location: '',
-          photo: '',
-          pledge: [],
-          phone: '',
-          donationType: 'Before Death',
-          nomineeName1: '',
-          nomineePhone1: '',
-          nomineeEmail1: '',
-          nomineeName2: '',
-          nomineePhone2: '',
-          nomineeEmail2: '',
-          nomineeName3: '',
-          nomineePhone3: '',
-          nomineeEmail3: '',
-          medicalCertificate: null
-        });
-        setTimeout(() => {
-          setShowToast(false);
-          setShowModal(false);
-        }, 3000);
-      } else {
-        setStatus((response.data && response.data.error) ? response.data.error : 'Failed to register. Please try again.');
-      }
+      await window.axios.post('/api/donor/register', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setStatus('Successfully registered for organ donation. Thank you!');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+      setForm({
+        name: '',
+        age: '',
+        gender: '',
+        bloodType: '',
+        email: '',
+        location: '',
+        photo: '',
+        pledge: [],
+        phone: '',
+        donationType: 'Before Death',
+        nomineeName1: '',
+        nomineePhone1: '',
+        nomineeName2: '',
+        nomineePhone2: '',
+        nomineeName3: '',
+        nomineePhone3: '',
+        medicalCertificate: null
+      });
     } catch (err) {
-      setStatus('Unexpected error. Please try again.');
+      setStatus('Failed to register. Please try again.');
     }
     setShowModal(false);
   }
