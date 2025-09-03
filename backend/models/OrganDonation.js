@@ -7,6 +7,12 @@ const organDonationSchema = new mongoose.Schema({
   bloodGroup: { type: String, required: true },
   city: { type: String, required: true },
   organs: [{ type: String, required: true }],
+  photo: { type: String },
+  medicalCertificate: { type: String },
+  donationType: { type: String },
+  nominee1: { name: String, phone: String, email: String },
+  nominee2: { name: String, phone: String, email: String },
+  nominee3: { name: String, phone: String, email: String },
   status: { type: String, default: 'Registered' },
   createdAt: { type: Date, default: Date.now }
 });

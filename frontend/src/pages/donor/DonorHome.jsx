@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import DonorSidebar from '../../components/Sidebar/DonorSidebar';
 import Chatbot from '../../components/Chatbot';
 import './DonorHome.css';
@@ -12,13 +13,21 @@ const DonorHome = () => {
     gender: '',
     bloodType: '',
     email: '',
-    location: '',
+    city: '',
     photo: '',
     pledge: [],
     phone: '',
     donationType: 'Before Death',
-    nomineeName: '',
-    nomineePhone: ''
+    nomineeName1: '',
+    nomineePhone1: '',
+    nomineeEmail1: '',
+    nomineeName2: '',
+    nomineePhone2: '',
+    nomineeEmail2: '',
+    nomineeName3: '',
+    nomineePhone3: '',
+    nomineeEmail3: '',
+    medicalCertificate: null
   });
   const [status, setStatus] = React.useState('');
   const [showToast, setShowToast] = useState(false);
@@ -32,9 +41,7 @@ const DonorHome = () => {
   function handlePhotoUpload(e) {
     const file = e.target.files[0];
     if (file) {
-      const reader = new window.FileReader();
-      reader.onload = ev => setForm(f=>({...f, photo:ev.target.result}));
-      reader.readAsDataURL(file);
+      setForm(f => ({ ...f, photo: file, photoPreview: URL.createObjectURL(file) }));
     }
   }
   async function handleSubmit(e) {
@@ -48,24 +55,31 @@ const DonorHome = () => {
             form[key].forEach((org, idx) => formData.append(`pledge[${idx}]`, org));
           } else if (key === 'medicalCertificate' && form.medicalCertificate) {
             formData.append('medicalCertificate', form.medicalCertificate);
+          } else if (key === 'photo' && form.photo) {
+            formData.append('photo', form.photo);
+          } else if (key === 'location') {
+            // skip 'location', do not send
           } else {
             formData.append(key, form[key]);
           }
         }
       }
-      await window.axios.post('/api/donor/register', formData, {
+      const response = await axios.post('/api/donor/register', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setStatus('Successfully registered for organ donation. Thank you!');
       setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
+      setTimeout(() => {
+        setShowToast(false);
+        setStatus('');
+      }, 3000);
       setForm({
         name: '',
         age: '',
         gender: '',
         bloodType: '',
         email: '',
-        location: '',
+        city: '',
         photo: '',
         pledge: [],
         phone: '',
@@ -78,10 +92,32 @@ const DonorHome = () => {
         nomineePhone3: '',
         medicalCertificate: null
       });
+      setShowModal(false);
     } catch (err) {
-      setStatus('Failed to register. Please try again.');
+      let errorMsg = 'Failed to register. Please try again.';
+      if (err.response) {
+        errorMsg = `Error ${err.response.status}: ${err.response.statusText}`;
+        if (err.response.data && typeof err.response.data === 'object') {
+          if (err.response.data.error) {
+            errorMsg += `\n${err.response.data.error}`;
+          } else if (err.response.data.message) {
+            errorMsg += `\n${err.response.data.message}`;
+          } else {
+            errorMsg += `\n${JSON.stringify(err.response.data)}`;
+          }
+        } else if (typeof err.response.data === 'string') {
+          errorMsg += `\n${err.response.data}`;
+        }
+      } else if (err.message) {
+        errorMsg = err.message;
+      }
+      setStatus(errorMsg);
+      setShowToast(true);
+      setTimeout(() => {
+        setShowToast(false);
+        setStatus('');
+      }, 3500);
     }
-    setShowModal(false);
   }
   return (
     <div className="dashboard-container">
@@ -106,21 +142,25 @@ const DonorHome = () => {
                   <div style={{display:'flex', gap:'1rem', marginBottom:'1rem'}}>
                     <div style={{flex:1}}>
                       <label style={{fontWeight:'500'}}>Full Name</label>
-                      <input type="text" value={form.name} onChange={e=>setForm({...form, name:e.target.value})} required placeholder="Enter your full name" style={inputStyle} />
+                      <label htmlFor="donor-name">Full Name</label>
+                      <input id="donor-name" type="text" value={form.name || ''} onChange={e=>setForm({...form, name:e.target.value})} required placeholder="Enter your full name" style={inputStyle} />
                     </div>
                     <div style={{width:'90px'}}>
                       <label style={{fontWeight:'500'}}>Age</label>
-                      <input type="number" value={form.age} onChange={e=>setForm({...form, age:e.target.value})} required min={0} max={120} placeholder="0" style={inputStyle} />
+                      <label htmlFor="donor-age">Age</label>
+                      <input id="donor-age" type="number" value={form.age || ''} onChange={e=>setForm({...form, age:e.target.value})} required min={0} max={120} placeholder="0" style={inputStyle} />
                     </div>
                   </div>
                   <div style={{marginBottom:'1rem'}}>
                     <label style={{fontWeight:'500'}}>Phone Number</label>
-                    <input type="tel" value={form.phone || ''} onChange={e=>setForm({...form, phone:e.target.value})} required placeholder="Enter your phone number" style={inputStyle} />
+                    <label htmlFor="donor-phone">Phone</label>
+                    <input id="donor-phone" type="tel" value={form.phone || ''} onChange={e=>setForm({...form, phone:e.target.value})} required placeholder="Enter your phone number" style={inputStyle} />
                   </div>
                   <div style={{display:'flex', gap:'1rem', marginBottom:'1rem'}}>
                     <div style={{flex:1}}>
                       <label style={{fontWeight:'500'}}>Gender</label>
-                      <select value={form.gender} onChange={e=>setForm({...form, gender:e.target.value})} required style={inputStyle}>
+                      <label htmlFor="donor-gender">Gender</label>
+                      <select id="donor-gender" value={form.gender || ''} onChange={e=>setForm({...form, gender:e.target.value})} required style={inputStyle} aria-label="Gender">
                         <option value="">Select Gender</option>
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
@@ -129,7 +169,8 @@ const DonorHome = () => {
                     </div>
                     <div style={{flex:1}}>
                       <label style={{fontWeight:'500'}}>Blood Type</label>
-                      <select value={form.bloodType} onChange={e=>setForm({...form, bloodType:e.target.value})} required style={inputStyle}>
+                      <label htmlFor="donor-bloodType">Blood Type</label>
+                      <select id="donor-bloodType" value={form.bloodType || ''} onChange={e=>setForm({...form, bloodType:e.target.value})} required style={inputStyle} aria-label="Blood Type">
                         <option value="">Select Blood Type</option>
                         <option value="A+">A+</option>
                         <option value="A-">A-</option>
@@ -143,12 +184,14 @@ const DonorHome = () => {
                     </div>
                   </div>
                   <label style={{fontWeight:'500'}}>Email</label>
-                  <input type="email" value={form.email} onChange={e=>setForm({...form, email:e.target.value})} required placeholder="your.email@example.com" style={inputStyle} />
+                  <label htmlFor="donor-email">Email</label>
+                  <input id="donor-email" type="email" value={form.email || ''} onChange={e=>setForm({...form, email:e.target.value})} required placeholder="your.email@example.com" style={inputStyle} />
                   <label style={{fontWeight:'500'}}>Location</label>
-                  <input type="text" value={form.location} onChange={e=>setForm({...form, location:e.target.value})} required placeholder="City, State" style={inputStyle} />
+                  <label htmlFor="donor-city">City</label>
+                  <input id="donor-city" type="text" value={form.city || ''} onChange={e=>setForm({...form, city:e.target.value})} required placeholder="Enter your city" style={inputStyle} />
                   <label style={{fontWeight:'500'}}>Profile Photo</label>
                   <div style={{border:'1.5px dashed #cbd5e1', borderRadius:'1.2rem', padding:'1.2rem', textAlign:'center', marginBottom:'1rem', cursor:'pointer'}} onClick={()=>photoInputRef.current.click()}>
-                    {form.photo ? <img src={form.photo} alt="Profile" style={{width:'80px', height:'80px', borderRadius:'50%', objectFit:'cover'}} /> : <span style={{color:'#94a3b8', fontSize:'2.2rem'}}>Click to upload photo</span>}
+                    {form.photoPreview ? <img src={form.photoPreview} alt="Profile" style={{width:'80px', height:'80px', borderRadius:'50%', objectFit:'cover'}} /> : <span style={{color:'#94a3b8', fontSize:'2.2rem'}}>Click to upload photo</span>}
                     <input type="file" accept="image/*" ref={photoInputRef} style={{display:'none'}} onChange={handlePhotoUpload} />
                   </div>
                   <label style={{fontWeight:'500'}}>Medical Certificate (Optional)</label>
