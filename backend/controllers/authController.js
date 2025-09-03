@@ -84,6 +84,11 @@ export const login = async (req, res) => {
 export const requestSignup = async (req, res) => {
   try {
     const { category } = req.body;
+    // File upload: req.file (multer)
+    let proofPath = '';
+    if (req.file) {
+      proofPath = req.file.path;
+    }
     if (category === 'Hospital') {
       // Hospital signup
       const { hospitalName, registrationNumber, email, password, address, contactNumber } = req.body;
@@ -97,7 +102,8 @@ export const requestSignup = async (req, res) => {
         licenseId: registrationNumber,
         address,
         contact: contactNumber,
-        status: 'PENDING'
+        status: 'PENDING',
+        verificationDocs: proofPath ? [proofPath] : []
       });
       return res.status(201).json({ user, hospital });
     } else if (category === 'Organization') {
@@ -112,7 +118,8 @@ export const requestSignup = async (req, res) => {
         name: orgName + (orgType ? ` (${orgType})` : ''),
         address,
         contact: contactNumber,
-        status: 'PENDING'
+        status: 'PENDING',
+        verificationDocs: proofPath ? [proofPath] : []
       });
       return res.status(201).json({ user, organization });
     } else {

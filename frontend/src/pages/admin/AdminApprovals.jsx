@@ -68,6 +68,7 @@ const AdminApprovals = () => {
                 <th>License/Type</th>
                 <th>Address</th>
                 <th>Contact</th>
+                <th>Proof of Evidence</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -82,6 +83,11 @@ const AdminApprovals = () => {
                   <td>{item.licenseId || item.type || '-'}</td>
                   <td>{item.address || '-'}</td>
                   <td>{item.contact || '-'}</td>
+                  <td>
+                    {item.verificationDocs && item.verificationDocs.length > 0 ? (
+                      <a href={`/${item.verificationDocs[0]}`} target="_blank" rel="noopener noreferrer">View Proof</a>
+                    ) : 'No file'}
+                  </td>
                   <td>{item.status}</td>
                   <td>
                     <button className="approve-btn" onClick={() => handleAction(item._id, 'approve')}>✅ Approve</button>

@@ -140,6 +140,8 @@ const Signup = () => {
                   <input type="text" placeholder="Enter address" value={hospitalAddress} onChange={e => setHospitalAddress(e.target.value)} required style={{width:'100%', padding:'0.8rem 1.2rem', borderRadius:'1.2rem', border:'1px solid #e5e7eb', background:'#f3f4f6', fontSize:'1rem', marginBottom:'0.8rem', boxSizing:'border-box'}} />
                   <label className="mobile-auth-label" style={{fontWeight:'500', fontSize:'0.85rem', marginBottom:'0.45rem', display:'block'}}>Contact Number</label>
                   <input type="text" placeholder="Enter contact number" value={hospitalContact} onChange={e => setHospitalContact(e.target.value)} required style={{width:'100%', padding:'0.8rem 1.2rem', borderRadius:'1.2rem', border:'1px solid #e5e7eb', background:'#f3f4f6', fontSize:'1rem', marginBottom:'0.8rem', boxSizing:'border-box'}} />
+                    <label className="mobile-auth-label" style={{fontWeight:'500', fontSize:'0.85rem', marginBottom:'0.45rem', display:'block'}}>Proof of Evidence (PDF/JPG)</label>
+                    <input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={e => setHospitalProof(e.target.files[0])} style={{width:'100%', marginBottom:'0.8rem'}} />
                 </>
               )}
               {/* Organization Fields */}
@@ -157,6 +159,8 @@ const Signup = () => {
                   <input type="text" placeholder="Enter address" value={orgAddress} onChange={e => setOrgAddress(e.target.value)} required style={{width:'100%', padding:'0.8rem 1.2rem', borderRadius:'1.2rem', border:'1px solid #e5e7eb', background:'#f3f4f6', fontSize:'1rem', marginBottom:'0.8rem', boxSizing:'border-box'}} />
                   <label className="mobile-auth-label" style={{fontWeight:'500', fontSize:'0.85rem', marginBottom:'0.45rem', display:'block'}}>Contact Number</label>
                   <input type="text" placeholder="Enter contact number" value={orgContact} onChange={e => setOrgContact(e.target.value)} required style={{width:'100%', padding:'0.8rem 1.2rem', borderRadius:'1.2rem', border:'1px solid #e5e7eb', background:'#f3f4f6', fontSize:'1rem', marginBottom:'0.8rem', boxSizing:'border-box'}} />
+                    <label className="mobile-auth-label" style={{fontWeight:'500', fontSize:'0.85rem', marginBottom:'0.45rem', display:'block'}}>Proof of Evidence (PDF/JPG)</label>
+                    <input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={e => setOrgProof(e.target.files[0])} style={{width:'100%', marginBottom:'0.8rem'}} />
                 </>
               )}
               <button className="mobile-auth-btn" type="submit" style={{width:'100%', background:'#22a6f5', color:'#fff', fontWeight:'bold', fontSize:'1.15rem', border:'none', borderRadius:'2rem', padding:'1rem 0', cursor:'pointer', textAlign:'center'}}>Create Account</button>

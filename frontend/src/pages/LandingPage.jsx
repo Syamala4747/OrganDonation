@@ -96,7 +96,7 @@ const LandingPage = () => {
       <style>{`
         @media (max-width: 768px) {
           .landing-header {
-            flex-direction: columni want this ui fr regi !important;
+            flex-direction: column !important;
             align-items: center !important;
             justify-content: center !important;
             gap: 0.5rem;

@@ -6,6 +6,7 @@ const organizationSchema = new mongoose.Schema({
   address: { type: String, required: true },
   contact: { type: String, required: true },
   status: { type: String, enum: ['PENDING', 'APPROVED', 'REJECTED'], default: 'PENDING' },
+  verificationDocs: [{ type: String }],
   donors: [{
     donor: { type: mongoose.Schema.Types.ObjectId, ref: 'Donor' },
     pledgeType: { type: String },
