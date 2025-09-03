@@ -1,5 +1,5 @@
 import Organization from '../models/Organization.js';
-import Donor from '../models/Donor.js';
+import OrganDonation from '../models/OrganDonation.js';
 
 // Get organization profile
 export const getOrgProfile = async (req, res) => {
@@ -25,10 +25,16 @@ export const updateOrgProfile = async (req, res) => {
   }
 };
 
-// Get after-death pledged donors
+// Get after-death pledged donors (from OrganDonation collection)
 export const getAfterDeathDonors = async (req, res) => {
   try {
-    const donors = await Donor.find({ donationType: 'after_death' }).populate('user', '-password');
+    // Show all donors except those who chose ONLY 'before_death'
+    const donors = await OrganDonation.find({
+      $or: [
+        { donationType: 'after_death' },
+        { donationType: 'both' }
+      ]
+    });
     res.json(donors);
   } catch (err) {
     res.status(500).json({ message: err.message });
